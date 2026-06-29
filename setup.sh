@@ -44,10 +44,12 @@ echo -e "\n${GREEN}[3/7] Installing Eclipse Cyclone DDS...${NC}"
 sudo apt-get install -y ros-$ROS_DISTRO-rmw-cyclonedds-cpp
 
 echo -e "\n${GREEN}[4/7] Installing Eclipse Zenoh...${NC}"
-if ! command -v zenohd &> /dev/null; then
-    echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | sudo tee /etc/apt/sources.list.d/zenoh.list > /dev/null
+if ! command -v zenoh-bridge-ros2dds &> /dev/null; then
+    sudo mkdir -p /etc/apt/keyrings
+    curl -L https://download.eclipse.org/zenoh/debian-repo/zenoh-public-key | sudo gpg --dearmor --yes --output /etc/apt/keyrings/zenoh-public-key.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/zenoh-public-key.gpg] https://download.eclipse.org/zenoh/debian-repo/ /" | sudo tee /etc/apt/sources.list.d/zenoh.list > /dev/null
     sudo apt-get update
-    sudo apt-get install -y zenoh zenoh-bridge-dds
+    sudo apt-get install -y zenoh-bridge-ros2dds
 else
     echo "Zenoh is already installed."
 fi
