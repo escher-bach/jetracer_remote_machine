@@ -24,7 +24,7 @@ echo -e "\n${GREEN}[2/7] Checking ROS 2 Installation...${NC}"
 # Default to Humble if no ROS_DISTRO is set in the environment
 export ROS_DISTRO=${ROS_DISTRO:-humble}
 
-if ! command -v ros2 &> /dev/null; then
+if [ ! -f "/opt/ros/$ROS_DISTRO/setup.bash" ]; then
     echo "ROS 2 not found. Installing ROS 2 $ROS_DISTRO (Desktop)..."
     sudo apt-get update && sudo apt-get install software-properties-common -y
     sudo add-apt-repository universe -y
