@@ -20,15 +20,6 @@ RUN apt-get update && apt-get install -y \
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Eclipse Zenoh bridge
-RUN mkdir -p /etc/apt/keyrings \
-    && curl -L https://download.eclipse.org/zenoh/debian-repo/zenoh-public-key \
-       | gpg --dearmor --yes --output /etc/apt/keyrings/zenoh-public-key.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/zenoh-public-key.gpg] https://download.eclipse.org/zenoh/debian-repo/ /" \
-       > /etc/apt/sources.list.d/zenoh.list \
-    && apt-get update \
-    && apt-get install -y zenoh-bridge-ros2dds \
-    && rm -rf /var/lib/apt/lists/*
 
 # Setup workspace
 RUN mkdir -p /ros2_ws/src
