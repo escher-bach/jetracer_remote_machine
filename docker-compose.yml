@@ -23,9 +23,7 @@ services:
       # Mount source for active development (hot-reload without rebuild)
       - ./jetracer_remote:/ros2_ws/src/jetracer_remote
 
-    devices:
-      # Joystick / gamepad for teleoperation
-      - /dev/input:/dev/input
+    privileged: true
 
     tty: true
     stdin_open: true
