@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  jetracer-remote:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jetracer-remote:latest
+    container_name: jetracer_remote
+    network_mode: "host"
+    ipc: "host"
+
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # WSLg / X11 GUI passthrough
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+
+    volumes:
+      # WSLg X11 and Wayland sockets for GUI passthrough
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /mnt/wslg:/mnt/wslg
+      # Mount source for active development (hot-reload without rebuild)
+      - ./jetracer_remote:/ros2_ws/src/jetracer_remote
+
+    devices:
+      # Joystick / gamepad for teleoperation
+      - /dev/input:/dev/input
+
+    tty: true
+    stdin_open: true
+
+  zenoh-bridge:
+    image: eclipse/zenoh-bridge-ros2dds:latest
+    container_name: jetracer_remote_zenoh
+    network_mode: "host"
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - ROS_DISTRO=humble
+    # Connect to the robot's Zenoh bridge. Set ROBOT_IP in .env
+    command: -e tcp/${ROBOT_IP}:7447

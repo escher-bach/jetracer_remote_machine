@@ -1,10 +1,70 @@
 # JetRacer Remote Machine
 
-This repository is the remote counterpart to the [jetracer_ros2](https://github.com/escher-bach/jetracer_ros2_port) package. It is designed to run on a host machine (laptop / WSL) to remotely interface with the JetRacer robot.
+This repository is the remote counterpart to the [jetracer_ros2](https://github.com/escher-bach/jetracer_ros2_port) package. It is designed to run on a host machine (laptop / WSL or Docker) to remotely interface with the JetRacer robot.
 
 It offloads heavy processing from the robot's onboard computer by receiving camera streams and sensor data over the network (via Zenoh and Cyclone DDS), and runs all OpenCV-based vision tasks (face tracking, colour tracking, motion detection, contour extraction, etc.), teleoperation, and RViz visualisations locally.
 
 ---
+
+## Installation
+
+There are two supported setups. The **Docker + WSLg** path is recommended for Windows users — it is fully reproducible and GUI-capable out of the box.
+
+---
+
+## Option A — Docker + WSLg (Recommended for Windows)
+
+This runs the entire remote stack inside a Docker container. GUI apps (RViz2, OpenCV windows) render natively on your Windows desktop via **WSLg** — no X server or VNC needed.
+
+### Prerequisites
+
+- Windows 10 21H2+ or Windows 11
+- WSL 2 with WSLg (ships by default on supported Windows versions — run `wsl --update` to be sure)
+- Docker Desktop with the **WSL 2 backend** enabled, **or** Docker Engine installed directly inside WSL 2
+
+> **Check WSLg is working**: Open WSL 2 and run `xclock`. A clock window should appear on your Windows desktop. If it does, you are good to go.
+
+### Setup
+
+1. **Clone the repository inside WSL 2** (not in a Windows path):
+
+   ```bash
+   git clone https://github.com/escher-bach/jetracer_remote_machine.git
+   cd jetracer_remote_machine
+   ```
+
+2. **Set your robot's IP address** in the `.env` file:
+
+   ```bash
+   # Edit .env and set ROBOT_IP to your Jetson Nano's IP
+   nano .env
+   ```
+
+3. **Build and start the containers:**
+
+   ```bash
+   docker compose up --build
+   ```
+
+   This builds the `jetracer-remote` image (ROS 2 Humble Desktop + OpenCV + Zenoh) and starts the Zenoh bridge pointed at your robot.
+
+4. **Open a shell into the running container:**
+
+   ```bash
+   docker exec -it jetracer_remote bash
+   ```
+
+5. **Launch any remote node** (GUI windows open automatically on your desktop):
+
+   ```bash
+   ros2 launch jetracer_remote rviz_launch.py
+   ```
+
+> **Source volume mount**: The `jetracer_remote` package is mounted live from your host into the container (`./jetracer_remote → /ros2_ws/src/jetracer_remote`), so you can edit Python nodes on Windows/WSL and they reflect immediately — no rebuild needed.
+
+---
+
+## Option B — Bare-metal Ubuntu / WSL 2 (Original setup)
 
 ## Installation (Ubuntu / WSL 2)
 
