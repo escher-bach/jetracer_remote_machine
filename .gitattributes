@@ -1,0 +1,12 @@
+# Force Unix line endings for all shell scripts and Docker files
+# so they work correctly inside Linux containers regardless of
+# whether they are edited on Windows or Linux.
+
+*.sh    text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+entrypoint.sh text eol=lf
+
+# Windows-safe files
+*.md    text eol=crlf
+*.txt   text eol=crlf
