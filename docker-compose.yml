@@ -35,5 +35,8 @@ services:
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - ROS_DISTRO=humble
-    # Connect to the robot's Zenoh bridge. Set ROBOT_IP in .env
-    command: -e tcp/${ROBOT_IP}:7447
+      # Comma-separated list of robot IPs, e.g. 192.168.0.22,192.168.0.31
+      - ROBOT_IPS=${ROBOT_IPS}
+    volumes:
+      - ./zenoh_entrypoint.sh:/zenoh_entrypoint.sh:ro
+    entrypoint: ["/bin/ash", "/zenoh_entrypoint.sh"]
