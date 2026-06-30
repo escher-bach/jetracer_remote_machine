@@ -1,30 +1,20 @@
-FROM ros:humble-desktop
+FROM osrf/ros:humble-desktop-full-jammy
 
 # Prevent interactive prompts during apt install
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system and vision dependencies
+# Install only what osrf/ros:humble-desktop-full-jammy does NOT already provide:
+#   - nano, python3-opencv: not in the base image
+#   - ros-humble-image-transport-plugins: compressed/theora transports, not in desktop-full
+#   - ros-humble-rmw-cyclonedds-cpp, ros-humble-joy, ros-humble-teleop-twist-joy: not in desktop-full
+#   - libglu1-mesa, mesa-utils, x11-apps: GL utilities and X11 test tools for WSLg
 RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg2 \
-    lsb-release \
-    build-essential \
-    git \
     nano \
-    python3-pip \
-    # OpenCV / vision
     python3-opencv \
-    python3-numpy \
-    # ROS 2 GUI and vision tools
-    ros-humble-rviz2 \
-    ros-humble-cv-bridge \
     ros-humble-image-transport-plugins \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-joy \
     ros-humble-teleop-twist-joy \
-    # X11 / Wayland libraries needed for GUI passthrough
-    libgl1-mesa-glx \
-    libgl1-mesa-dri \
     libglu1-mesa \
     mesa-utils \
     x11-apps \
