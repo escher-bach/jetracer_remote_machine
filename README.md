@@ -1,28 +1,17 @@
 # JetRacer Remote Machine
 
-This repository is the remote counterpart to the [jetracer_ros2](https://github.com/escher-bach/jetracer_ros2_port) package. It is designed to run on a host machine (laptop / WSL or Docker) to remotely interface with the JetRacer robot.
+This repository is the remote counterpart to the [jetracer_ros2](https://github.com/escher-bach/jetracer_ros2_port) package. It is designed to run on a host machine via Docker to remotely interface with the JetRacer robot.
 
 It offloads heavy processing from the robot's onboard computer by receiving camera streams and sensor data over the network (via Zenoh and Cyclone DDS), and runs all OpenCV-based vision tasks (face tracking, colour tracking, motion detection, contour extraction, etc.), teleoperation, and RViz visualisations locally.
 
 ---
 
-## Installation
+## Installation — Docker + WSLg
 
-There are two supported setups. The **Docker + WSLg** path is recommended for Windows users — it is fully reproducible and GUI-capable out of the box.
+This runs the entire remote stack inside Docker. GUI apps (RViz2, OpenCV windows) render natively on your Windows desktop via **WSLg** — no X server or VNC needed.
 
----
-
-## Option A — Docker + WSLg (Recommended for Windows)
-
-This runs the entire remote stack inside a Docker container. GUI apps (RViz2, OpenCV windows) render natively on your Windows desktop via **WSLg** — no X server or VNC needed.
-
-### Prerequisites
-
-- Windows 10 21H2+ or Windows 11
-- WSL 2 with WSLg (ships by default on supported Windows versions — run `wsl --update` to be sure)
-- Docker Desktop with the **WSL 2 backend** enabled, **or** Docker Engine installed directly inside WSL 2
-
-> **Check WSLg is working**: Open WSL 2 and run `xclock`. A clock window should appear on your Windows desktop. If it does, you are good to go.
+> [!IMPORTANT]
+> The GUI passthrough in this setup (`DISPLAY`, `WAYLAND_DISPLAY`, `/tmp/.X11-unix`, `/mnt/wslg`) is configured specifically for **Windows with WSLg**. If you are running on native Ubuntu, these volume mounts and environment variables will need to be updated to match your display server configuration.
 
 ### Setup
 
@@ -33,11 +22,18 @@ This runs the entire remote stack inside a Docker container. GUI apps (RViz2, Op
    cd jetracer_remote_machine
    ```
 
-2. **Set your robot's IP address** in the `.env` file:
+2. **Set your robot IP(s)** in the `.env` file:
 
    ```bash
-   # Edit .env and set ROBOT_IP to your Jetson Nano's IP
    nano .env
+   ```
+
+   ```ini
+   # Single robot
+   ROBOT_IPS=192.168.0.31
+
+   # Multiple robots — comma-separated
+   ROBOT_IPS=192.168.0.22,192.168.0.31
    ```
 
 3. **Build and start the containers:**
@@ -46,7 +42,7 @@ This runs the entire remote stack inside a Docker container. GUI apps (RViz2, Op
    docker compose up --build
    ```
 
-   This builds the `jetracer-remote` image (ROS 2 Humble Desktop + OpenCV + Zenoh) and starts the Zenoh bridge pointed at your robot.
+   This builds the `jetracer-remote` image (ROS 2 Humble Desktop + OpenCV) and starts the Zenoh bridge pointed at your robot(s). The Zenoh bridge is handled automatically — no separate command needed.
 
 4. **Open a shell into the running container:**
 
@@ -61,56 +57,6 @@ This runs the entire remote stack inside a Docker container. GUI apps (RViz2, Op
    ```
 
 > **Source volume mount**: The `jetracer_remote` package is mounted live from your host into the container (`./jetracer_remote → /ros2_ws/src/jetracer_remote`), so you can edit Python nodes on Windows/WSL and they reflect immediately — no rebuild needed.
-
----
-
-## Option B — Bare-metal Ubuntu / WSL 2 (Original setup)
-
-## Installation (Ubuntu / WSL 2)
-
-### WSL 2 Mirrored Networking (Required for WSL users)
-
-By default WSL uses NAT, which prevents the robot from discovering your WSL instance. Enable **Mirrored Networking** first:
-
-1. Open File Explorer and go to your user folder (e.g. `C:\Users\YourUsername`).
-2. Create or edit the file `.wslconfig` and add:
-
-   ```ini
-   [wsl2]
-   networkingMode=mirrored
-   ```
-
-3. Restart WSL from PowerShell:
-
-   ```cmd
-   wsl --shutdown
-   ```
-
-### Clone and Run Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/escher-bach/jetracer_remote_machine.git
-   cd jetracer_remote_machine
-   ```
-
-2. **Run the automated setup script:**
-
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-
-   The script installs ROS 2 Humble (if missing), Eclipse Cyclone DDS, the Zenoh bridge, initialises `rosdep`, installs all package dependencies, and builds the workspace. This may take several minutes.
-
-3. **Apply the environment changes:**
-
-   ```bash
-   source ~/.bashrc
-   ```
-
-   *(Or simply close and reopen your terminal.)*
 
 ---
 
@@ -142,17 +88,13 @@ ros2 launch jetracer_ros2 camera_slam_nav_launch.py
 
 Wait until SLAM Toolbox, Nav2, and the camera node are all reported as active.
 
-### Step 3 — Remote machine: connect to the robot
+### Step 3 — Remote machine: start the Docker stack
 
-On your laptop / WSL, connect the local Zenoh instance to the robot's bridge:
-
-```bash
-zenoh-bridge-ros2dds -e tcp/<robot-ip>:7447
-```
-
-Replace `<robot-ip>` with the actual IP address of the Jetson Nano (e.g. `192.168.0.31`).
+On your laptop, run `docker compose up` (if not already running). The Zenoh bridge container connects to the robot automatically using the IPs set in `.env`.
 
 ### Step 4 — Verify topics are visible
+
+Inside the `jetracer_remote` container:
 
 ```bash
 ros2 topic list

@@ -4,10 +4,6 @@ FROM osrf/ros:humble-desktop-full-jammy
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install only what osrf/ros:humble-desktop-full-jammy does NOT already provide:
-#   - nano, python3-opencv: not in the base image
-#   - ros-humble-image-transport-plugins: compressed/theora transports, not in desktop-full
-#   - ros-humble-rmw-cyclonedds-cpp, ros-humble-joy, ros-humble-teleop-twist-joy: not in desktop-full
-#   - libglu1-mesa, mesa-utils, x11-apps: GL utilities and X11 test tools for WSLg
 RUN apt-get update && apt-get install -y \
     nano \
     python3-opencv \
@@ -15,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-joy \
     ros-humble-teleop-twist-joy \
-    libglu1-mesa \
+    libglu1-mesa \ 
     mesa-utils \
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
