@@ -8,7 +8,7 @@ It offloads heavy processing from the robot's onboard computer by receiving came
 
 ## Installation — Docker + WSLg
 
-This runs the entire remote stack inside Docker. GUI apps (RViz2, OpenCV windows) render natively on your Windows desktop via **WSLg** — no X server or VNC needed.
+This runs the entire remote stack inside Docker. GUI apps (RViz2, OpenCV windows) render natively on your Windows desktop via **WSLg** 
 
 > [!IMPORTANT]
 > The GUI passthrough in this setup (`DISPLAY`, `WAYLAND_DISPLAY`, `/tmp/.X11-unix`, `/mnt/wslg`) is configured specifically for **Windows with WSLg**. If you are running on native Ubuntu, these volume mounts and environment variables will need to be updated to match your display server configuration.
@@ -42,7 +42,7 @@ This runs the entire remote stack inside Docker. GUI apps (RViz2, OpenCV windows
    docker compose up --build
    ```
 
-   This builds the `jetracer-remote` image (ROS 2 Humble Desktop + OpenCV) and starts the Zenoh bridge pointed at your robot(s). The Zenoh bridge is handled automatically — no separate command needed.
+   This builds the `jetracer-remote` image (ROS 2 Humble Desktop + OpenCV) and starts the Zenoh bridge pointed at your robot(s). The Zenoh bridge is handled automatically.
 
 4. **Open a shell into the running container:**
 
@@ -56,7 +56,7 @@ This runs the entire remote stack inside Docker. GUI apps (RViz2, OpenCV windows
    ros2 launch jetracer_remote rviz_launch.py
    ```
 
-> **Source volume mount**: The `jetracer_remote` package is mounted live from your host into the container (`./jetracer_remote → /ros2_ws/src/jetracer_remote`), so you can edit Python nodes on Windows/WSL and they reflect immediately — no rebuild needed.
+> **Source volume mount**: The `jetracer_remote` package is mounted live from your host into the container (`./jetracer_remote → /ros2_ws/src/jetracer_remote`), so you can edit Python nodes on Windows/WSL and they reflect immediately.
 
 ---
 

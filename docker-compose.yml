@@ -31,9 +31,7 @@ services:
   zenoh-bridge:
     image: eclipse/zenoh-bridge-ros2dds:latest
     container_name: jetracer_remote_zenoh
-    ports:
-      - "7447:7447/tcp"
-      - "7447:7447/udp"
+    network_mode: "host"
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - ROS_DISTRO=humble
