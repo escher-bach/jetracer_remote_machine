@@ -1,11 +1,16 @@
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
+    namespace_arg = DeclareLaunchArgument('namespace', default_value='', description='Robot namespace (e.g. bot1)')
+
     joy_node = Node(
         package='joy',
         executable='joy_node',
         name='joy_node',
+        namespace=LaunchConfiguration('namespace'),
         output='screen'
     )
 
@@ -13,6 +18,7 @@ def generate_launch_description():
         package='jetracer_remote',
         executable='teleop_joy',
         name='teleop_joy_node',
+        namespace=LaunchConfiguration('namespace'),
         output='screen',
         parameters=[
             {'x_speed': 0.3},
@@ -23,6 +29,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        namespace_arg,
         joy_node,
         teleop_joy_node
     ])
