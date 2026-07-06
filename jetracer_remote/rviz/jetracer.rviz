@@ -125,6 +125,8 @@ Visualization Manager:
     - Class: rviz_default_plugins/PublishPoint
       Single click: true
       Topic: {namespace}/clicked_point
+    - Class: rviz_default_plugins/SetGoal
+      Topic: {namespace}/goal_pose
   Value: true
   Views:
     Current:
