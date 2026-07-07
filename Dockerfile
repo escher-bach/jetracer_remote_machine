@@ -25,7 +25,8 @@ WORKDIR /ros2_ws
 COPY jetracer_remote/package.xml src/jetracer_remote/package.xml
 
 # Initialize rosdep and install dependencies
-RUN rosdep update \
+RUN apt-get update \
+    && rosdep update \
     && rosdep install -i --from-path src --rosdistro humble -y \
     && rm -rf /var/lib/apt/lists/*
 
